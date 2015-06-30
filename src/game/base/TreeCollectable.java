@@ -33,4 +33,13 @@ public class TreeCollectable extends CollectableObject {
     public String toStringContent() {
 	return super.toStringContent();
     }
+
+    public void addPoints(int points) {
+	addToPoints(points);
+    }
+
+    @Override
+    public CollectableKey getKey() {
+	return CollectableKey.TREE;
+    }
 }

@@ -1,9 +1,10 @@
 package game;
 
 import game.base.Citizen;
+import game.base.CollectableKey;
 import game.base.Coordinate;
 import game.base.GameField;
-import game.base.PositionObject;
+import game.base.HomeBase;
 import game.base.Team;
 import game.base.TreeObject;
 import java.util.HashMap;
@@ -109,11 +110,15 @@ public class application extends Application {
 
 	    System.out.println("Add Team " + team);
 
-	    Citizen cit = new Citizen(team, new Coordinate(0, 0), actualCenter);
+	    HomeBase homeBase = new HomeBase(actualCenter);
+	    fieldMap.get(actualCenter.getY()).put(actualCenter.getX(), "B");
+	    Coordinate startPoint = new Coordinate(actualCenter.getX() + 1, actualCenter.getY());
+
+	    Citizen cit = new Citizen(team, actualCenter, startPoint);
 
 	    System.out.println("Add Citizen at X: " + actualCenter.getX() + ", Y: " + actualCenter.getY() + " with home X: 0, Y: 0");
 	    gameField.addObject(cit);
-	    fieldMap.get(actualCenter.getY()).put(actualCenter.getX(), "B");
+	    fieldMap.get(startPoint.getY()).put(startPoint.getX(), "C");
 
 	    System.out.println("####################### FIELD #######################");
 	    String field = "";
@@ -138,18 +143,18 @@ public class application extends Application {
 	    int loopCounter = 0;
 
 	    while (steps < 1000) {
-		if (collected >= 300) {
+		if (cit.getTotalCollected() >= 300) {
 		    cit.goHome();
-		    if (cit.getCenter().equals(cit.getHome())) {
+		    if (cit.isAtHome()) {
 			System.out.println("Citizen " + cit.getId() + " is at home");
-			break;
+			homeBase.addToCollectable(cit);
+			collected = homeBase.getCollectedPoints(CollectableKey.TREE);
 		    }
 		} else {
 		    cit.findNextObject();
 		    if (loopCounter >= 1000) {
 			break;
 		    }
-		    collected = cit.getCollected();
 		    cit.moveForward();
 		}
 

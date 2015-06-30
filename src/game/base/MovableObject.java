@@ -39,7 +39,6 @@ public abstract class MovableObject extends TeamObject {
 	    setCenter(movingTo);
 	    updateCoordinateSet();
 	    steps++;
-	    System.out.println("Move to " + movingTo);
 	}
     }
 
@@ -56,7 +55,6 @@ public abstract class MovableObject extends TeamObject {
 	if (steps <= 1000) {
 	    found = coordinateSet.findNextObject(getCenter(), application.getGameField());
 	    if (found != null) {
-		System.out.println("Collecting at position " + found.getCenter());
 		collect(found);
 	    }
 	}
@@ -72,7 +70,6 @@ public abstract class MovableObject extends TeamObject {
 
     public void goHome() throws Exception {
 	if (!getCenter().equals(getHome())) {
-	    System.out.println("Going home");
 	    int newX = getCenter().getX();
 	    int newY = getCenter().getY();
 	    int deltaX = getCenter().getX() - getHome().getX();
@@ -162,6 +159,13 @@ public abstract class MovableObject extends TeamObject {
 	}
 
 	moveTo(new Coordinate(newX, newY));
+    }
+
+    public boolean isAtHome() {
+	int deltaX = getCenter().getX() - getHome().getX();
+	int deltaY = getCenter().getY() - getHome().getY();
+
+	return Math.abs(deltaX) <= 1 && Math.abs(deltaY) <= 1;
     }
 
     @Override

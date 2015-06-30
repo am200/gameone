@@ -58,7 +58,7 @@ public class HealthObject extends PositionObject {
 
     protected void checkForHitPoints() throws Exception {
 	if (health <= 0) {
-	    System.out.println(this.getId()+ " died");
+	    System.out.println(this.getId() + " died");
 	    application.getGameField().removeObject(this.getId());
 	}
     }

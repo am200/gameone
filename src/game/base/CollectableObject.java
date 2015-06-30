@@ -4,7 +4,9 @@ package game.base;
  *
  * @author amohamed
  */
-public class CollectableObject {
+public abstract class CollectableObject {
+
+    public abstract CollectableKey getKey();
 
     private int points;
 
@@ -20,6 +22,10 @@ public class CollectableObject {
 	this.points += hit;
     }
 
+    public void clearPoints() {
+	this.points = 0;
+    }
+
     @Override
     public String toString() {
 	return "CollectableObject{" + toStringContent() + '}';
@@ -28,4 +34,5 @@ public class CollectableObject {
     public String toStringContent() {
 	return "points=" + points;
     }
+
 }
