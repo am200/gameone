@@ -38,7 +38,7 @@ public class GameField {
 	}
 	this.coordinateObjects.put(object.getId(), coordinateMap);
 
-	if (!(object instanceof MovableObject)) {
+	if (object instanceof TreeObject) {
 	    coordinateIds.put(object.getCenter(), object.getId());
 	}
 
@@ -70,9 +70,6 @@ public class GameField {
     }
 
     public PositionObject getObjectByCooridante(Coordinate coord) throws Exception {
-//	System.out.println("getObjectByCoordinate " + coord);
-//	System.out.println("coordinateIds.containsKey(coord) " + coordinateIds.containsKey(coord));
-//	System.out.println("coordinateIds.containsKey(coord) && objects.containsKey(coordinateIds.get(coord) " + (coordinateIds.containsKey(coord) && objects.containsKey(coordinateIds.get(coord))));
 	if (coordinateIds.containsKey(coord) && objects.containsKey(coordinateIds.get(coord))) {
 	    return objects.get(coordinateIds.get(coord));
 	}

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.TreeMap;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -47,6 +48,7 @@ public class application extends Application {
 
 	    System.out.println("################## Start the game #################");
 	    System.out.println("####################################################");
+	    Map<Coordinate, TreeObject> treeCoorinates = new TreeMap<>();
 	    for (int i = 0; i < treeCounter; i++) {
 
 		int randX = rand.nextInt(GAME_FIELD_WIDTH);
@@ -67,9 +69,19 @@ public class application extends Application {
 			break;
 		    }
 		}
-		System.out.println("Add Tree at X: " + randX + ", Y: " + randY);
-		gameField.addObject(new TreeObject(new Coordinate(randX, randY), 1, 1));
+
+		Coordinate treeCoordinate = new Coordinate(randX, randY);
+		TreeObject tree = new TreeObject(treeCoordinate, 1, 1);
+
+		treeCoorinates.put(treeCoordinate, tree);
+		gameField.addObject(tree);
 		fieldMap.get(randY).put(randX, "*");
+	    }
+
+	    int treeCounting = 1;
+	    for (Coordinate coord : treeCoorinates.keySet()) {
+		System.out.println("Add Tree nr " + treeCounting + " at X: " + coord.getX() + ", Y: " + coord.getY());
+		treeCounting++;
 	    }
 
 	    int randX = rand.nextInt(GAME_FIELD_WIDTH);
@@ -97,9 +109,9 @@ public class application extends Application {
 
 	    System.out.println("Add Team " + team);
 
-	    Citizen cit = new Citizen(team, actualCenter, actualCenter);
+	    Citizen cit = new Citizen(team, new Coordinate(0, 0), actualCenter);
 
-	    System.out.println("Add Citizen at X: " + actualCenter.getX() + ", Y: " + actualCenter.getY());
+	    System.out.println("Add Citizen at X: " + actualCenter.getX() + ", Y: " + actualCenter.getY() + " with home X: 0, Y: 0");
 	    gameField.addObject(cit);
 	    fieldMap.get(actualCenter.getY()).put(actualCenter.getX(), "B");
 
@@ -116,31 +128,40 @@ public class application extends Application {
 		}
 		field += "|\n";
 	    }
-	    System.out.println(firstAndLastRow+"\n"+field+firstAndLastRow);
+	    System.out.println(firstAndLastRow + "\n" + field + firstAndLastRow);
 	    System.out.println("####################################################");
 
 	    System.out.println("####################################################");
 
 	    int steps = 0;
 	    int collected = 0;
-	    int counter = 0;
+	    int loopCounter = 0;
 
-	    while (steps < 1000 || collected < 300) {
-		PositionObject posObj = cit.findNextObject();
-		System.out.println("FOund object  "+ posObj);
-		if (counter >= 1000) {
-		    break;
+	    while (steps < 1000) {
+		if (collected >= 300) {
+		    cit.goHome();
+		    if (cit.getCenter().equals(cit.getHome())) {
+			System.out.println("Citizen " + cit.getId() + " is at home");
+			break;
+		    }
+		} else {
+		    cit.findNextObject();
+		    if (loopCounter >= 1000) {
+			break;
+		    }
+		    collected = cit.getCollected();
+		    cit.moveForward();
 		}
-		cit.moveForward();
+
 		steps++;
-		counter++;
+		loopCounter++;
 	    }
 
 	    System.out.println("####################################################");
 
 	    System.out.println("Made " + steps + " steps");
 	    System.out.println("Collected " + collected + " tree parts");
-	    System.out.println("Break counter is " + counter);
+	    System.out.println("Break counter is " + loopCounter);
 
 	    System.out.println("####################################################");
 

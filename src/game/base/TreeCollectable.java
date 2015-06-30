@@ -13,12 +13,13 @@ public class TreeCollectable extends CollectableObject {
     private static final int MAXIMUM = 300;
 
     public void collect(int hit, TreeObject tree) throws Exception {
-	if (getPoints() < MAXIMUM) {
-	    if (tree.getHealth() > 0) {
-		tree.decreaseHealthByValue(hit);
-		addToPoints(hit);
 
-		tree.checkForHitPoints();
+	while (getPoints() < MAXIMUM && tree.getHealth() > 0) {
+	    tree.decreaseHealthByValue(hit);
+	    addToPoints(hit);
+	    tree.checkForHitPoints();
+	    if (getPoints() >= MAXIMUM || tree.getHealth() <= 0) {
+		break;
 	    }
 	}
     }

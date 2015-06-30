@@ -12,6 +12,7 @@ public class HealthObject extends PositionObject {
 
     public HealthObject(Coordinate center, int width, int height) {
 	super(center, width, height);
+	this.health = GameUtil.MAXIMUM_POINTS;
     }
 
     public int getHealth() {
@@ -57,6 +58,7 @@ public class HealthObject extends PositionObject {
 
     protected void checkForHitPoints() throws Exception {
 	if (health <= 0) {
+	    System.out.println(this.getId()+ " died");
 	    application.getGameField().removeObject(this.getId());
 	}
     }

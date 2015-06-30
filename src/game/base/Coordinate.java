@@ -4,7 +4,7 @@ package game.base;
  *
  * @author amohamed
  */
-public class Coordinate {
+public class Coordinate implements Comparable {
 
     private int x;
     private int y;
@@ -48,12 +48,27 @@ public class Coordinate {
 	}
 	return true;
     }
-    
-    
 
     @Override
     public String toString() {
 	return "Coordinate{" + "x=" + x + ", y=" + y + '}';
+    }
+
+    @Override
+    public int hashCode() {
+	int hash = 7;
+	hash = 19 * hash + this.x;
+	hash = 19 * hash + this.y;
+	return hash;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+	Coordinate other = (Coordinate) o;
+	if (new Integer(this.getX()).equals(other.getX())) {
+	    return new Integer(this.getY()).compareTo(other.getY());
+	}
+	return new Integer(this.getX()).compareTo(other.getX());
     }
 
 }

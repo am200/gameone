@@ -36,11 +36,10 @@ public abstract class MovableObject extends TeamObject {
 
 	Pair<Integer, Integer> borders = application.getGameField().getBorders();
 	if (movingTo.getX() <= borders.getKey() && movingTo.getX() >= 0 && movingTo.getY() <= borders.getValue() && movingTo.getY() >= 0) {
-
-//	    System.out.println("Move to X: " + getCenter().getX() + ", Y: " + getCenter().getY());
 	    setCenter(movingTo);
 	    updateCoordinateSet();
 	    steps++;
+	    System.out.println("Move to " + movingTo);
 	}
     }
 
@@ -56,30 +55,24 @@ public abstract class MovableObject extends TeamObject {
 	PositionObject found = null;
 	if (steps <= 1000) {
 	    found = coordinateSet.findNextObject(getCenter(), application.getGameField());
-	    if (found == null) {
-//		System.out.println("Nothing found moveForward ");
-		moveForward();
-		found = findNextObject();
-	    } else {
-		System.out.println("FOund object " + found);
+	    if (found != null) {
+		System.out.println("Collecting at position " + found.getCenter());
+		collect(found);
 	    }
 	}
-	if(found != null){
-	    System.out.println("Collecting at position " + found.getCenter());
-	    collect(found);
-	}
+
 	return found;
     }
 
     private void updateCoordinateSet() {
 	coordinateSet.updateCoordinateSet(getCenter());
     }
-    
-    protected abstract void collect(PositionObject object)throws Exception ;
+
+    protected abstract void collect(PositionObject object) throws Exception;
 
     public void goHome() throws Exception {
 	if (!getCenter().equals(getHome())) {
-
+	    System.out.println("Going home");
 	    int newX = getCenter().getX();
 	    int newY = getCenter().getY();
 	    int deltaX = getCenter().getX() - getHome().getX();

@@ -53,10 +53,8 @@ public abstract class AbstractCoordinateSet {
     public PositionObject findNextObject(Coordinate objectCenter, GameField gameField) throws Exception {
 	updateCoordinateSet(objectCenter);
 	for (Entry<String, Coordinate> entry : coordinateSet.entrySet()) {
-	    System.out.println("FindNextObject " + entry.getValue());
 	    PositionObject temp = gameField.getObjectByCooridante(entry.getValue());
 	    if (temp != null) {
-		System.out.println("FOUND " + temp.toString());
 		return temp;
 	    }
 	}
