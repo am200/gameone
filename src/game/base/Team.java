@@ -1,5 +1,6 @@
 package game.base;
 
+import game.collectable.CollectableObject;
 import java.util.Objects;
 
 /**

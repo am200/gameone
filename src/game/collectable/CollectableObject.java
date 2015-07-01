@@ -1,4 +1,6 @@
-package game.base;
+package game.collectable;
+
+import game.collectable.util.CollectableKey;
 
 /**
  *

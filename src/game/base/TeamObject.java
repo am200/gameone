@@ -1,5 +1,8 @@
 package game.base;
 
+import game.collectable.CollectableObject;
+import game.building.HomeBase;
+
 /**
  *
  * @author amohamed

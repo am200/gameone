@@ -1,10 +1,10 @@
 package game;
 
-import game.base.Citizen;
-import game.base.CollectableKey;
+import game.unit.Citizen;
+import game.collectable.util.CollectableKey;
 import game.base.Coordinate;
-import game.base.GameField;
-import game.base.HomeBase;
+import game.terrain.GameField;
+import game.building.HomeBase;
 import game.base.Team;
 import game.base.TreeObject;
 import java.util.HashMap;

@@ -1,4 +1,10 @@
-package game.base;
+package game.unit;
+
+import game.base.Coordinate;
+import game.building.HomeBase;
+import game.base.MovableObject;
+import game.base.PositionObject;
+import game.base.Team;
 
 /**
  *

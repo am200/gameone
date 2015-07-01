@@ -1,5 +1,15 @@
-package game.base;
+package game.unit;
 
+import game.collectable.util.CollectableKey;
+import game.collectable.CollectableObject;
+import game.base.Coordinate;
+import game.coordinateSet.CoordinateSetFactory;
+import game.building.HomeBase;
+import game.base.MovableObject;
+import game.base.PositionObject;
+import game.base.Team;
+import game.collectable.TreeCollectable;
+import game.base.TreeObject;
 import java.util.HashMap;
 import java.util.Map;
 

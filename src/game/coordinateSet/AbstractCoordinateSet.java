@@ -1,6 +1,9 @@
-package game.base;
+package game.coordinateSet;
 
 import game.application;
+import game.base.Coordinate;
+import game.terrain.GameField;
+import game.base.PositionObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;

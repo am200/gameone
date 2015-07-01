@@ -1,4 +1,6 @@
-package game.base;
+package game.coordinateSet;
+
+import game.base.Coordinate;
 
 /**
  *

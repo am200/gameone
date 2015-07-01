@@ -1,5 +1,11 @@
-package game.base;
+package game.building;
 
+import game.collectable.util.CollectableKey;
+import game.collectable.CollectableObject;
+import game.base.Coordinate;
+import game.base.HealthObject;
+import game.collectable.TreeCollectable;
+import game.unit.Citizen;
 import java.util.HashMap;
 import java.util.Map;
 

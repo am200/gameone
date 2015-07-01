@@ -1,4 +1,7 @@
-package game.base;
+package game.collectable;
+
+import game.collectable.util.CollectableKey;
+import game.base.TreeObject;
 
 /**
  *

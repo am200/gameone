@@ -1,5 +1,7 @@
 package game.base;
 
+import game.coordinateSet.AbstractCoordinateSet;
+import game.building.HomeBase;
 import game.application;
 import java.util.List;
 import java.util.Random;

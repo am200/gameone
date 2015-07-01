@@ -1,5 +1,8 @@
-package game.base;
+package game.terrain;
 
+import game.base.Coordinate;
+import game.base.PositionObject;
+import game.base.TreeObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;

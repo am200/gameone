@@ -1,5 +1,6 @@
 package game.base;
 
+import game.util.GameUtil;
 import game.application;
 
 /**
@@ -56,7 +57,7 @@ public class HealthObject extends PositionObject {
 	health += value;
     }
 
-    protected void checkForHitPoints() {
+    public void checkForHitPoints() {
 	if (health <= 0) {
 	    System.out.println(this.getId() + " died");
 	    application.getGameField().removeObject(this.getId());

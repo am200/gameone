@@ -1,4 +1,11 @@
-package game.base;
+package game.coordinateSet;
+
+import game.base.PositionObject;
+import game.coordinateSet.CitizenCoordinateSet;
+import game.coordinateSet.SoldierCoordinateSet;
+import game.coordinateSet.AbstractCoordinateSet;
+import game.unit.Soldier;
+import game.unit.Citizen;
 
 /**
  *
