@@ -50,7 +50,7 @@ public abstract class AbstractCoordinateSet {
 
     protected abstract RangeSet[] defineCoordinateRange();
 
-    public PositionObject findNextObject(Coordinate objectCenter, GameField gameField) throws Exception {
+    public PositionObject findNextObject(Coordinate objectCenter, GameField gameField) {
 	updateCoordinateSet(objectCenter);
 	for (Entry<String, Coordinate> entry : coordinateSet.entrySet()) {
 	    PositionObject temp = gameField.getObjectByCooridante(entry.getValue());

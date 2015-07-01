@@ -28,7 +28,7 @@ public class GameField {
 	this.coordinateIds = new HashMap<>();
     }
 
-    public void addObject(PositionObject object) throws Exception {
+    public void addObject(PositionObject object) {
 	this.objects.put(object.getId(), object);
 //	System.out.println("Object id " + object.getId() + " object : " + object);
 
@@ -48,7 +48,7 @@ public class GameField {
 	return new Pair<>(getWidth(), getHeight());
     }
 
-    public void removeObject(String id) throws Exception {
+    public void removeObject(String id) {
 	this.objects.remove(id);
 
 	Map<Coordinate, String> result = new HashMap<>();
@@ -62,14 +62,14 @@ public class GameField {
 
     }
 
-    public PositionObject getObjectById(String id) throws Exception {
+    public PositionObject getObjectById(String id) {
 	if (objects.containsKey(id)) {
 	    return objects.get(id);
 	}
 	return null;
     }
 
-    public PositionObject getObjectByCooridante(Coordinate coord) throws Exception {
+    public PositionObject getObjectByCooridante(Coordinate coord) {
 	if (coordinateIds.containsKey(coord) && objects.containsKey(coordinateIds.get(coord))) {
 	    return objects.get(coordinateIds.get(coord));
 	}
@@ -82,6 +82,16 @@ public class GameField {
 
     public Integer getHeight() {
 	return this.width;
+    }
+
+    public int getObjectCountByType(String type) {
+	int result = 0;
+	for (String id : objects.keySet()) {
+	    if (id.toLowerCase().startsWith(type.toLowerCase())) {
+		result++;
+	    }
+	}
+	return result;
     }
 
 }

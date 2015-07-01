@@ -24,6 +24,9 @@ public class application extends Application {
     private static GameField gameField;
     public static final int GAME_FIELD_WIDTH = 10;
     public static final int GAME_FIELD_HEIGHT = 10;
+    public static final int MAXIMUM_STEPS = 1000;
+    public static final int MAXIMUM_LOOP_COUNTER = 1000;
+    public static final int TEMPORARY_COUNTER = 100;
 
     public static GameField getGameField() {
 	return gameField;
@@ -35,7 +38,7 @@ public class application extends Application {
 	    gameField = new GameField(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT);
 
 	    Random rand = new Random();
-	    int treeCounter = rand.nextInt((GAME_FIELD_WIDTH * GAME_FIELD_HEIGHT) / 3);
+	    int treeCounter = rand.nextInt((GAME_FIELD_WIDTH * GAME_FIELD_HEIGHT) / 2);
 
 	    Map<Integer, Map<Integer, String>> fieldMap = new HashMap<>();
 
@@ -66,7 +69,7 @@ public class application extends Application {
 			emptyField = true;
 			break;
 		    }
-		    if (tempCounter >= 100) {
+		    if (tempCounter >= TEMPORARY_COUNTER) {
 			break;
 		    }
 		}
@@ -114,7 +117,7 @@ public class application extends Application {
 	    fieldMap.get(actualCenter.getY()).put(actualCenter.getX(), "B");
 	    Coordinate startPoint = new Coordinate(actualCenter.getX() + 1, actualCenter.getY());
 
-	    Citizen cit = new Citizen(team, actualCenter, startPoint);
+	    Citizen cit = new Citizen(team, homeBase, startPoint);
 
 	    System.out.println("Add Citizen at X: " + actualCenter.getX() + ", Y: " + actualCenter.getY() + " with home X: 0, Y: 0");
 	    gameField.addObject(cit);
@@ -141,23 +144,17 @@ public class application extends Application {
 	    int steps = 0;
 	    int collected = 0;
 	    int loopCounter = 0;
+	    boolean stillTrees = true;
+	    boolean needTrees = false;
 
-	    while (steps < 1000) {
-		if (cit.getTotalCollected() >= 300) {
-		    cit.goHome();
-		    if (cit.isAtHome()) {
-			System.out.println("Citizen " + cit.getId() + " is at home");
-			homeBase.addToCollectable(cit);
-			collected = homeBase.getCollectedPoints(CollectableKey.TREE);
-		    }
-		} else {
-		    cit.findNextObject();
-		    if (loopCounter >= 1000) {
-			break;
-		    }
-		    cit.moveForward();
-		}
-
+	    while (stillTrees || !needTrees) {
+		cit.startCollecting(CollectableKey.TREE);
+		collected = homeBase.getCollectedPoints(CollectableKey.TREE);
+//		if (loopCounter >= MAXIMUM_LOOP_COUNTER) {
+//		    break;
+//		}
+		needTrees = collected <= homeBase.getCollectableMaximum(CollectableKey.TREE);
+		stillTrees = gameField.getObjectCountByType(CollectableKey.TREE.name()) > 0;
 		steps++;
 		loopCounter++;
 	    }
@@ -166,6 +163,8 @@ public class application extends Application {
 
 	    System.out.println("Made " + steps + " steps");
 	    System.out.println("Collected " + collected + " tree parts");
+	    System.out.println("Stopped because of no need for Trees " + !needTrees);
+	    System.out.println("Stopped because of no Trees " + !stillTrees);
 	    System.out.println("Break counter is " + loopCounter);
 
 	    System.out.println("####################################################");

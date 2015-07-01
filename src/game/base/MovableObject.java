@@ -17,8 +17,8 @@ public abstract class MovableObject extends TeamObject {
 
     protected List<? extends PositionObject> usableObjects;
 
-    public MovableObject(Team team, Coordinate home, int velocity, Coordinate center, int width, int height) {
-	super(team, center, home, width, height);
+    public MovableObject(Team team, HomeBase home, int velocity, Coordinate center, int width, int height) {
+	super(team, home, center, width, height);
 	this.velocity = velocity;
     }
 
@@ -32,7 +32,7 @@ public abstract class MovableObject extends TeamObject {
 	this.velocity = velocity;
     }
 
-    public void moveTo(Coordinate movingTo) throws Exception {
+    public void moveTo(Coordinate movingTo) {
 
 	Pair<Integer, Integer> borders = application.getGameField().getBorders();
 	if (movingTo.getX() <= borders.getKey() && movingTo.getX() >= 0 && movingTo.getY() <= borders.getValue() && movingTo.getY() >= 0) {
@@ -50,7 +50,7 @@ public abstract class MovableObject extends TeamObject {
 	this.coordinateSet = coordinateSet;
     }
 
-    public PositionObject findNextObject() throws Exception {
+    public PositionObject findNextObject() {
 	PositionObject found = null;
 	if (steps <= 1000) {
 	    found = coordinateSet.findNextObject(getCenter(), application.getGameField());
@@ -66,14 +66,14 @@ public abstract class MovableObject extends TeamObject {
 	coordinateSet.updateCoordinateSet(getCenter());
     }
 
-    protected abstract void collect(PositionObject object) throws Exception;
+    protected abstract void collect(PositionObject object);
 
-    public void goHome() throws Exception {
+    public void goHome() {
 	if (!getCenter().equals(getHome())) {
 	    int newX = getCenter().getX();
 	    int newY = getCenter().getY();
-	    int deltaX = getCenter().getX() - getHome().getX();
-	    int deltaY = getCenter().getY() - getHome().getY();
+	    int deltaX = getCenter().getX() - getHomeCoordinate().getX();
+	    int deltaY = getCenter().getY() - getHomeCoordinate().getY();
 
 	    if (Math.abs(deltaX) >= Math.abs(deltaY)) {
 		if (deltaX >= 0) {
@@ -94,7 +94,7 @@ public abstract class MovableObject extends TeamObject {
 	}
     }
 
-    public void moveForward() throws Exception {
+    public void moveForward() {
 	int newX = getCenter().getX();
 	int newY = getCenter().getY();
 
@@ -162,8 +162,8 @@ public abstract class MovableObject extends TeamObject {
     }
 
     public boolean isAtHome() {
-	int deltaX = getCenter().getX() - getHome().getX();
-	int deltaY = getCenter().getY() - getHome().getY();
+	int deltaX = getCenter().getX() - getHomeCoordinate().getX();
+	int deltaY = getCenter().getY() - getHomeCoordinate().getY();
 
 	return Math.abs(deltaX) <= 1 && Math.abs(deltaY) <= 1;
     }

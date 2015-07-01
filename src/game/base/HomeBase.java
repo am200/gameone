@@ -17,7 +17,11 @@ public class HomeBase extends HealthObject {
     public HomeBase(Coordinate center) {
 	super(center, WIDTH, HEIGHT);
 	collectableMap = new HashMap<>();
-	collectableMap.put(CollectableKey.TREE, new TreeCollectable(0));
+	collectableMap.put(CollectableKey.TREE, new TreeCollectable(0, 1000));
+    }
+
+    public int getCollectableMaximum(CollectableKey key) {
+	return collectableMap.containsKey(key) ? collectableMap.get(key).getPoints() : 0;
     }
 
     public void addToCollectable(Citizen citizen) {
@@ -37,5 +41,13 @@ public class HomeBase extends HealthObject {
 
     public int getCollectedPoints(CollectableKey collectableKey) {
 	return collectableMap.get(collectableKey).getPoints();
+    }
+
+    public int getTotalCollectableMaximum() {
+	int result = 0;
+	for (CollectableObject collectable : collectableMap.values()) {
+	    result += collectable.getPoints();
+	}
+	return result;
     }
 }
