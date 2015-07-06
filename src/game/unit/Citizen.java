@@ -63,14 +63,18 @@ public class Citizen extends MovableObject {
 
     public void startCollecting(CollectableKey key) {
 	if (getTotalCollected() >= MAXIMUM_WEARABLE) {
-	    goHome();
-	    if (isAtHome()) {
-		System.out.println("Citizen " + getId() + " is at home");
-		getHome().addToCollectable(this);
-	    }
+	    deliverCollected();
 	} else {
 	    findNextObject();
 	    moveForward();
+	}
+    }
+
+    public void deliverCollected() {
+	goHome();
+	if (isAtHome()) {
+	    System.out.println("Citizen " + getId() + " is at home");
+	    getHome().addToCollectable(this);
 	}
     }
 

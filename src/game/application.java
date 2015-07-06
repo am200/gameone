@@ -25,7 +25,7 @@ public class application extends Application {
     public static final int GAME_FIELD_WIDTH = 10;
     public static final int GAME_FIELD_HEIGHT = 10;
     public static final int MAXIMUM_STEPS = 1000;
-    public static final int MAXIMUM_LOOP_COUNTER = 1000;
+    public static final int MAXIMUM_LOOP_COUNTER = 10000;
     public static final int TEMPORARY_COUNTER = 100;
 
     public static GameField getGameField() {
@@ -145,16 +145,30 @@ public class application extends Application {
 	    int collected = 0;
 	    int loopCounter = 0;
 	    boolean stillTrees = true;
-	    boolean needTrees = false;
+	    boolean needTrees = true;
 
-	    while (stillTrees || !needTrees) {
-		cit.startCollecting(CollectableKey.TREE);
-		collected = homeBase.getCollectedPoints(CollectableKey.TREE);
-//		if (loopCounter >= MAXIMUM_LOOP_COUNTER) {
-//		    break;
-//		}
+	    int noTreeCounter = 0;
+
+	    while (true) {
+
 		needTrees = collected <= homeBase.getCollectableMaximum(CollectableKey.TREE);
+		if (needTrees && stillTrees) {
+		    cit.startCollecting(CollectableKey.TREE);
+		} else {
+		    cit.deliverCollected();
+		}
+		collected = homeBase.getCollectedPoints(CollectableKey.TREE);
+		if (loopCounter >= MAXIMUM_LOOP_COUNTER) {
+		    break;
+		}
 		stillTrees = gameField.getObjectCountByType(CollectableKey.TREE.name()) > 0;
+		if (noTreeCounter >= 5) {
+		    break;
+		}
+
+		if (!stillTrees) {
+		    noTreeCounter++;
+		}
 		steps++;
 		loopCounter++;
 	    }
