@@ -10,26 +10,33 @@ public class AbstractBaseObject {
 
     private String id;
 
+    private String idPrefix;
+
     protected AbstractBaseObject() {
 	super();
 	generateId();
     }
 
     protected void generateId() {
-	this.id = this.getClass().getSimpleName()+ UUID.randomUUID();
+	this.idPrefix = this.getClass().getSimpleName();
+	this.id = idPrefix + UUID.randomUUID();
     }
 
     public String getId() {
 	return this.id;
     }
 
+    public String getIdPrefix() {
+	return this.idPrefix;
+    }
+
     @Override
     public String toString() {
-	return "BaseObject{" +toStringContent()+'}';
+	return "BaseObject{" + toStringContent() + '}';
     }
-    
-    protected String toStringContent(){
-	return  "id=" + id;
+
+    protected String toStringContent() {
+	return "id=" + id + ", " + "idPrefix="+idPrefix;
     }
 
 }

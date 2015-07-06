@@ -2,7 +2,7 @@ package game.terrain;
 
 import game.base.Coordinate;
 import game.base.PositionObject;
-import game.base.TreeObject;
+import game.base.Tree;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,7 +41,7 @@ public class GameField {
 	}
 	this.coordinateObjects.put(object.getId(), coordinateMap);
 
-	if (object instanceof TreeObject) {
+	if (object instanceof Tree) {
 	    coordinateIds.put(object.getCenter(), object.getId());
 	}
 

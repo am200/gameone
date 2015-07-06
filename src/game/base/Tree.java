@@ -4,9 +4,9 @@ package game.base;
  *
  * @author amohamed
  */
-public class TreeObject extends HealthObject {
+public class Tree extends HealthObject {
 
-    public TreeObject(Coordinate center, int width, int height) {
+    public Tree(Coordinate center, int width, int height) {
 	super(center, width, height);
     }
 

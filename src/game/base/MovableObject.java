@@ -3,7 +3,6 @@ package game.base;
 import game.coordinateSet.AbstractCoordinateSet;
 import game.building.HomeBase;
 import game.application;
-import java.util.List;
 import java.util.Random;
 import javafx.util.Pair;
 
@@ -11,20 +10,20 @@ import javafx.util.Pair;
  *
  * @author amohamed
  */
-public abstract class MovableObject extends TeamObject {
+public abstract class MovableObject extends TeamObject implements Runnable {
 
     private AbstractCoordinateSet coordinateSet;
 
-    private int steps = 0;
+    private final static int DEFAULT_TIME = 5000;
 
-    protected List<? extends PositionObject> usableObjects;
-
-    public MovableObject(Team team, HomeBase home, int velocity, Coordinate center, int width, int height) {
-	super(team, home, center, width, height);
+    public MovableObject(HomeBase home, int velocity, Coordinate center, int width, int height) {
+	super(home, center, width, height);
 	this.velocity = velocity;
     }
 
     private int velocity;
+    private boolean wait;
+    private int waitTime;
 
     public int getVelocity() {
 	return velocity;
@@ -40,7 +39,6 @@ public abstract class MovableObject extends TeamObject {
 	if (movingTo.getX() <= borders.getKey() && movingTo.getX() >= 0 && movingTo.getY() <= borders.getValue() && movingTo.getY() >= 0) {
 	    setCenter(movingTo);
 	    updateCoordinateSet();
-	    steps++;
 	}
     }
 
@@ -52,26 +50,12 @@ public abstract class MovableObject extends TeamObject {
 	this.coordinateSet = coordinateSet;
     }
 
-    public PositionObject findNextObject() {
-	PositionObject found = null;
-	if (steps <= 1000) {
-	    found = coordinateSet.findNextObject(getCenter(), application.getGameField());
-	    if (found != null) {
-		collect(found);
-	    }
-	}
-
-	return found;
-    }
-
     private void updateCoordinateSet() {
 	coordinateSet.updateCoordinateSet(getCenter());
     }
 
-    protected abstract void collect(PositionObject object);
-
     public void goHome() {
-	if (!getCenter().equals(getHome())) {
+	if (!getCenter().equals(getHome().getCenter())) {
 	    int newX = getCenter().getX();
 	    int newY = getCenter().getY();
 	    int deltaX = getCenter().getX() - getHomeCoordinate().getX();
@@ -104,8 +88,8 @@ public abstract class MovableObject extends TeamObject {
 
 	int temp = new Random().nextInt(15) % 8;
 
-	int addToX = 0;
-	int addToY = 0;
+	int addToX;
+	int addToY;
 
 	switch (temp) {
 	    case 0:
@@ -166,9 +150,57 @@ public abstract class MovableObject extends TeamObject {
     public boolean isAtHome() {
 	int deltaX = getCenter().getX() - getHomeCoordinate().getX();
 	int deltaY = getCenter().getY() - getHomeCoordinate().getY();
-
 	return Math.abs(deltaX) <= 1 && Math.abs(deltaY) <= 1;
     }
+
+    @Override
+    public void run() {
+	try {
+	    if (hasToWait()) {
+		yield();
+	    } else {
+		execute();
+	    }
+	    repaint();
+
+	} catch (Exception e) {
+	    System.out.println("Exception occured at run of " + getIdPrefix() + " with id " + getId());
+	    e.printStackTrace();
+	}
+    }
+
+    public boolean hasToWait() {
+	return this.wait;
+    }
+
+    public void setToWait(boolean wait) {
+	this.wait = wait;
+    }
+
+    public void waitFor() {
+	this.waitFor(DEFAULT_TIME);
+	setToWait(true);
+    }
+
+    public synchronized void waitFor(int time) {
+	this.waitTime = time;
+	setToWait(true);
+	try {
+	    wait(waitTime);
+	} catch (InterruptedException e) {
+	    System.out.println("InterruptedException for " + getIdPrefix() + " with id " + getId());
+	    e.printStackTrace();
+	}
+    }
+
+    public abstract void execute();
+
+    public synchronized void yield() {
+	getHome().showCollected();
+	waitFor(waitTime);
+    }
+
+    public abstract void repaint();
 
     @Override
     public String toString() {
@@ -181,8 +213,6 @@ public abstract class MovableObject extends TeamObject {
     public String toStringContent() {
 	return "velocity=" + velocity
 		+ (coordinateSet != null ? coordinateSet + ", " : "")
-		+ "steps=" + steps
-		+ (usableObjects != null ? usableObjects + ", " : "")
 		+ super.toStringContent();
     }
 

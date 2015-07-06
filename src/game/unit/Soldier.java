@@ -3,7 +3,6 @@ package game.unit;
 import game.base.Coordinate;
 import game.building.HomeBase;
 import game.base.MovableObject;
-import game.base.PositionObject;
 import game.base.Team;
 
 /**
@@ -13,11 +12,16 @@ import game.base.Team;
 public class Soldier extends MovableObject {
 
     public Soldier(Team team, HomeBase home, Coordinate center) {
-	super(team, home, 1, center, 3, 3);
+	super(home, 1, center, 3, 3);
     }
 
     @Override
-    protected void collect(PositionObject object) {
+    public void execute() {
+	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void repaint() {
 	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

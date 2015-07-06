@@ -13,10 +13,10 @@ public class TeamObject extends HealthObject {
 
     private final HomeBase home;
 
-    public TeamObject(Team team, HomeBase home, Coordinate center, int width, int height) {
+    public TeamObject(HomeBase home, Coordinate center, int width, int height) {
 	super(center, width, height);
 	this.home = home;
-	this.team = team;
+	this.team = home.getTeam();
     }
 
     public Team getTeam() {

@@ -1,17 +1,14 @@
 package game.unit;
 
+import game.application;
 import game.collectable.util.CollectableKey;
 import game.collectable.CollectableObject;
 import game.base.Coordinate;
+import game.base.HealthObject;
 import game.coordinateSet.CoordinateSetFactory;
-import game.building.HomeBase;
 import game.base.MovableObject;
-import game.base.PositionObject;
-import game.base.Team;
-import game.collectable.TreeCollectable;
-import game.base.TreeObject;
-import java.util.HashMap;
-import java.util.Map;
+import game.building.Building;
+import game.building.HomeBase;
 
 /**
  *
@@ -19,62 +16,53 @@ import java.util.Map;
  */
 public class Citizen extends MovableObject {
 
-    private Map<CollectableKey, CollectableObject> collectableMap;
+    private CollectableObject collectable;
 
-    public Citizen(Team team, HomeBase home, Coordinate center) {
-	super(team, home, 1, center, 3, 3);
+    public Citizen(Building home, Coordinate center) {
+	super((HomeBase) home, 1, center, 3, 3);
 	setCoordinateSet(new CoordinateSetFactory<>().getCoordinateSet(this));
-	collectableMap = new HashMap<>();
-	collectableMap.put(CollectableKey.TREE, new TreeCollectable(0));
+	System.out.println("New Citizen at " + center);
     }
 
-    private final static int MAXIMUM_WEARABLE = 300;
+    private final int MAXIMUM_WEARABLE = 100;
 
-    private int strength = 4;
+    private final int strength = 4;
 
-    @Override
-    protected void collect(PositionObject object) {
+    public void setCollect(CollectableKey key) {
+	if (CollectableKey.TREE.equals(key)) {
+	    collectable = new CollectableObject(0, MAXIMUM_WEARABLE, CollectableKey.TREE);
+	}
+    }
+
+    protected void collect(HealthObject object) {
 	if (object != null) {
-	    if (object.getId().startsWith("TreeObject")) {
-		TreeCollectable treeCollectable = (TreeCollectable) collectableMap.get(CollectableKey.TREE);
-		TreeObject treeObj = (TreeObject) object;
-		treeCollectable.getPoints();
-		treeCollectable.collect(strength, treeObj);
-
-	    }
+	    collectable.collect(strength, object);
 	}
     }
 
-    public CollectableObject getCollected(CollectableKey collectableKey) {
-	return collectableMap.get(collectableKey);
-    }
-
-    public int getCollectedPoints(CollectableKey collectableKey) {
-	return collectableMap.get(collectableKey).getPoints();
-    }
-
-    public int getTotalCollected() {
-	int result = 0;
-	for (CollectableObject collectable : collectableMap.values()) {
-	    result += collectable.getPoints();
+    public HealthObject findNextObject() {
+	HealthObject found;
+	found = (HealthObject) getCoordinateSet().findNextObject(getCenter(), collectable.getKey(), application.getGameField());
+	if (found != null) {
+	    collect(found);
 	}
-	return result;
+	return found;
     }
 
-    public void startCollecting(CollectableKey key) {
-	if (getTotalCollected() >= MAXIMUM_WEARABLE) {
-	    deliverCollected();
-	} else {
-	    findNextObject();
-	    moveForward();
-	}
+    public CollectableObject getCollected() {
+	return collectable;
+    }
+
+    public int getCollectedPoints() {
+	return collectable.getPoints();
     }
 
     public void deliverCollected() {
-	goHome();
 	if (isAtHome()) {
-	    System.out.println("Citizen " + getId() + " is at home");
+	    System.out.println(getIdPrefix() + " with id " + getId() + " arrived at home");
 	    getHome().addToCollectable(this);
+	} else {
+	    goHome();
 	}
     }
 
@@ -88,8 +76,32 @@ public class Citizen extends MovableObject {
     @Override
     public String toStringContent() {
 	return ("strength=" + strength)
-		+ (collectableMap != null ? "collectableMap=" + collectableMap + ", " : "")
+		+ (collectable != null ? "collectable=" + collectable + ", " : "")
 		+ super.toStringContent();
+    }
+
+    @Override
+    public void execute() {
+	if (getHome().getCollectableDifference(CollectableKey.TREE) > 0) {
+	    if (getCollectedPoints() >= MAXIMUM_WEARABLE) {
+		deliverCollected();
+	    } else {
+		findNextObject();
+		moveForward();
+	    }
+	} else {
+	    if (isAtHome()) {
+		deliverCollected();
+		yield();
+	    } else {
+		goHome();
+	    }
+	}
+    }
+
+    @Override
+    public void repaint() {
+	System.out.println("Repaint for " + getIdPrefix() + " with id " + getId());
     }
 
 }

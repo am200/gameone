@@ -4,6 +4,7 @@ import game.application;
 import game.base.Coordinate;
 import game.terrain.GameField;
 import game.base.PositionObject;
+import game.collectable.util.CollectableKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -58,6 +59,18 @@ public abstract class AbstractCoordinateSet {
 	for (Entry<String, Coordinate> entry : coordinateSet.entrySet()) {
 	    PositionObject temp = gameField.getObjectByCooridante(entry.getValue());
 	    if (temp != null) {
+		return temp;
+	    }
+	}
+	return null;
+    }
+    
+    public PositionObject findNextObject(Coordinate objectCenter, CollectableKey key, GameField gameField) {
+	updateCoordinateSet(objectCenter);
+	for (Entry<String, Coordinate> entry : coordinateSet.entrySet()) {
+	    PositionObject temp = gameField.getObjectByCooridante(entry.getValue());
+	    
+	    if (temp != null && temp.getIdPrefix().toLowerCase().contains(key.name().toLowerCase())) {
 		return temp;
 	    }
 	}
