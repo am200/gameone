@@ -2,3 +2,7 @@
 /dist/
 /build/
 build/*
+.classpath
+.project
+bin/
+build.fxbuild
