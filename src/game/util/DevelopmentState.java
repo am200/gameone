@@ -6,20 +6,29 @@ package game.util;
  */
 public enum DevelopmentState {
 
-    BASE
-//	    (new CollectableObject());
+    STATE_0,
+    STATE_1,
+    STATE_2,
+    STATE_3,
+    STATE_4,
+    STATE_5,
+    STATE_6,
+    STATE_7,
+    STATE_8,
+    STATE_9,
+    STATE_10;
 
-//     TODO define 
-//    private Map<CollectableKey, CollectableObject> collectableMap;
-//    private Set<Building> buildings;
-//    private Set<Unit> units;
-////    
-////
-//
-//    private DevelopmentState(CollectableObject[] collectableMap, Building[] buildings, Unit[] units) {
-//	this.collectableMap = collectableMap;
-//	this.buildings = buildings;
-//	this.units = units;
-//    }
+    private final static String state = "STATE_";
+
+    public static DevelopmentState getNextState(DevelopmentState actualDevelopmentState) {
+	Integer stateNr = Integer.valueOf(actualDevelopmentState.name().replace(state, ""));
+
+	for (DevelopmentState devState : values()) {
+	    if (devState.name().equals(state + stateNr)) {
+		return devState;
+	    }
+	}
+	return actualDevelopmentState;
+    }
 
 }

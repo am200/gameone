@@ -2,6 +2,7 @@ package game.base;
 
 import game.collectable.CollectableObject;
 import game.building.HomeBase;
+import game.collectable.util.CollectableKey;
 
 /**
  *
@@ -34,7 +35,6 @@ public class TeamObject extends HealthObject {
     public Coordinate getHomeCoordinate() {
 	return this.home.getCenter();
     }
-
     @Override
     public String toString() {
 	return "TeamObject{"

@@ -45,7 +45,8 @@ public class CollectableObject {
 
     public int getPointDifference() {
 	int diff = maximum - points;
-	return diff > 0 ? Math.abs(diff) : 0;
+	int result = diff > 0 ? Math.abs(diff) : 0;
+	return result;
     }
 
     public void addPoints(int points) {

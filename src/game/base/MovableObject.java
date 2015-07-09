@@ -3,6 +3,7 @@ package game.base;
 import game.coordinateSet.AbstractCoordinateSet;
 import game.building.HomeBase;
 import game.application;
+import game.unit.Unit;
 import java.util.Random;
 import javafx.util.Pair;
 
@@ -14,11 +15,14 @@ public abstract class MovableObject extends TeamObject implements Runnable {
 
     private AbstractCoordinateSet coordinateSet;
 
-    private final static int DEFAULT_TIME = 5000;
+    private Thread actualThread;
+
+    private final static int DEFAULT_TIME = 1000;
 
     public MovableObject(HomeBase home, int velocity, Coordinate center, int width, int height) {
 	super(home, center, width, height);
 	this.velocity = velocity;
+	addToHomeBase();
     }
 
     private int velocity;
@@ -159,6 +163,7 @@ public abstract class MovableObject extends TeamObject implements Runnable {
 	    if (hasToWait()) {
 		yield();
 	    } else {
+		actualThread.interrupt();
 		execute();
 	    }
 	    repaint();
@@ -182,25 +187,31 @@ public abstract class MovableObject extends TeamObject implements Runnable {
 	setToWait(true);
     }
 
-    public synchronized void waitFor(int time) {
+    public void waitFor(int time) {
 	this.waitTime = time;
 	setToWait(true);
 	try {
-	    wait(waitTime);
+	    actualThread.sleep(waitTime);
 	} catch (InterruptedException e) {
-	    System.out.println("InterruptedException for " + getIdPrefix() + " with id " + getId());
+	    System.out.println("InterruptedException at sleep");
 	    e.printStackTrace();
 	}
     }
 
     public abstract void execute();
 
-    public synchronized void yield() {
+    public void yield() {
 	getHome().showCollected();
 	waitFor(waitTime);
     }
 
     public abstract void repaint();
+
+    protected abstract Unit getUnit();
+
+    public void setThread(Thread actualThread) {
+	this.actualThread = actualThread;
+    }
 
     @Override
     public String toString() {
@@ -214,6 +225,10 @@ public abstract class MovableObject extends TeamObject implements Runnable {
 	return "velocity=" + velocity
 		+ (coordinateSet != null ? coordinateSet + ", " : "")
 		+ super.toStringContent();
+    }
+
+    private void addToHomeBase() {
+	getHome().addUnitToBuilding(getUnit(), this);
     }
 
 }

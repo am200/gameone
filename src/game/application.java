@@ -7,6 +7,7 @@ import game.terrain.GameField;
 import game.building.HomeBase;
 import game.base.Team;
 import game.base.Tree;
+import game.util.DevelopmentState;
 import game.util.ProductionMode;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,6 +35,10 @@ public class application extends Application {
     public static final int TEMPORARY_COUNTER = 100;
 
     private final static String filePath = "/Users/amohamed/Desktop/output.txt";
+
+    public static DevelopmentState getStartDevelopmentState() {
+	return DevelopmentState.STATE_1;
+    }
 
     private String[][] stringArray;
 
@@ -168,14 +173,14 @@ public class application extends Application {
 	    int timer = 0;
 
 	    while (true) {
-		cit.execute();
-		cit2.execute();
+//		cit.execute();
+//		cit2.execute();
+		homeBase.execute();
 
-		if (timer >= 10) {
+		if (timer >= 100) {
 		    homeBase.showCollected();
 		    timer = 0;
 		}
-		System.out.println("Counting " + timer);
 		timer++;
 	    }
 

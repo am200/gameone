@@ -4,10 +4,21 @@ import game.base.Coordinate;
 import game.base.HealthObject;
 import game.base.MovableObject;
 import game.base.Team;
+import game.collectable.CollectableObject;
+import game.collectable.util.CollectableKey;
 import game.unit.Citizen;
 import game.unit.Unit;
+import game.util.DevelopmentState;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Set;
+import java.util.TreeMap;
+import javafx.util.Pair;
 
 /**
  *
@@ -15,34 +26,54 @@ import java.util.Set;
  */
 public abstract class Building extends HealthObject {
 
-    private final Set<Unit> units;
+    private final NavigableMap<DevelopmentState, Set<Unit>> units;
     private final Team team;
     private Coordinate unitStart;
-    private Set<MovableObject> belongingUnits;
+    private final Map<Unit, List<MovableObject>> belongingUnits;
 
     public Building(Team team, Coordinate center, int width, int height) {
 	super(center, width, height);
-	this.units = new HashSet<>();
+	this.units = new TreeMap<>();
 	this.team = team;
-	belongingUnits = new HashSet<>();
+	belongingUnits = new HashMap<>();
 	defineUnitStart();
-	Set<Unit> addedUnits = addProduceAbleUnits();
+	Map<DevelopmentState, Set<Unit>> addedUnits = addProduceAbleUnits();
 	if (addedUnits != null && !addedUnits.isEmpty()) {
-	    units.addAll(addedUnits);
+	    units.putAll(addedUnits);
 	}
     }
 
-    public MovableObject produceUnit(Unit unit) {
-	if (unit == null || !units.contains(unit)) {
-	    return null;
+    public void produceUnit(Unit unit) {
+	if (unit == null || !getProducableUnits().contains(unit)) {
+	    return;
 	}
-	MovableObject result = null;
-	switch (unit) {
-	    case CITIZEN:
-		result = new Citizen(this, getUnitStart());
-		break;
+	if (reduceCollectable(unit)) {
+	    switch (unit) {
+		case CITIZEN:
+		    new Citizen(this, getUnitStart());
+		    break;
+	    }
 	}
-	belongingUnits.add(result);
+    }
+
+    public Set<Unit> getProducableUnits() {
+	return getProducableUnits(getTeam().getDevelopmentState());
+    }
+
+    private Set<Unit> getProducableUnits(DevelopmentState developmentState) {
+	Set<Unit> result = units.get(developmentState);
+
+	if (result == null) {
+	    result = new HashSet<>();
+	}
+
+	DevelopmentState lowerState = units.lowerKey(developmentState);
+	if (lowerState != null) {
+	    Set<Unit> lowerUnits = getProducableUnits(lowerState);
+	    if (lowerUnits != null) {
+		result.addAll(lowerUnits);
+	    }
+	}
 	return result;
     }
 
@@ -68,5 +99,79 @@ public abstract class Building extends HealthObject {
 	this.unitStart = unitStart;
     }
 
-    protected abstract Set<Unit> addProduceAbleUnits();
+    protected abstract Map<DevelopmentState, Set<Unit>> addProduceAbleUnits();
+
+    private boolean reduceCollectable(Unit unit) {
+	for (Pair<CollectableKey, Integer> cost : unit.getCosts()) {
+	    CollectableObject collectable = getTeam().getCollected(cost.getKey());
+	    if (collectable == null || collectable.getPoints() < cost.getValue()) {
+		return false;
+	    }
+	}
+
+	for (Pair<CollectableKey, Integer> cost : unit.getCosts()) {
+	    getTeam().addPoints(cost.getKey(), -cost.getValue());
+	}
+	return true;
+    }
+
+    public void addToCollectable(Citizen citizen) {
+	CollectableObject collectable = citizen.getCollected();
+	if (team.containsCollectable(collectable.getKey())) {
+	    team.addPoints(collectable.getKey(), collectable.getPoints());
+	    collectable.clearPoints();
+	}
+    }
+
+    public int getCollectableMaximum(CollectableKey key) {
+	return team.getCollectableMaximum(key);
+    }
+
+    public void showCollected() {
+	System.out.println("####################################################");
+	for (CollectableKey key : team.getCollectableMap().keySet()) {
+	    int points = team.getCollectedPoints(key);
+
+	    System.out.println("Collected " + points + " tree parts");
+	    if (points >= getCollectableMaximum(key)) {
+		produce();
+	    }
+	    points = team.getCollectedPoints(key);
+	    System.out.println("Collected " + points + " tree parts");
+	}
+	for (Entry<Unit, List<MovableObject>> entry : belongingUnits.entrySet()) {
+	    System.out.println("There are " + entry.getValue().size() + " " + entry.getKey() + "(s)");
+	}
+
+	execute();
+	System.out.println("####################################################");
+    }
+
+    protected abstract void produce();
+
+    protected abstract boolean checkForExecute();
+
+    public void execute() {
+	if (checkForExecute()) {
+	    for (List<MovableObject> movableSet : belongingUnits.values()) {
+		for (MovableObject movable : movableSet) {
+		    movable.execute();
+		}
+	    }
+	}
+    }
+
+    public void addUnitToBuilding(Unit unit, MovableObject result) {
+	List<MovableObject> set;
+	if (belongingUnits.containsKey(unit)) {
+	    set = belongingUnits.get(unit);
+	} else {
+	    set = new ArrayList<>();
+	}
+	set.add(result);
+	Thread t = new Thread(result);
+	result.setThread(t);
+	belongingUnits.put(unit, set);
+    }
+
 }

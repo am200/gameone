@@ -7,6 +7,7 @@ package game.collectable.util;
 public enum CollectableKey {
     
     TREE,
+    FOOD,
     STONE,
     IRON,
     GOLD

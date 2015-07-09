@@ -75,13 +75,17 @@ public class Citizen extends MovableObject {
 
     @Override
     public String toStringContent() {
-	return ("strength=" + strength)
+	return ("strength=" + strength+ ", ")
 		+ (collectable != null ? "collectable=" + collectable + ", " : "")
 		+ super.toStringContent();
     }
 
     @Override
     public void execute() {
+	if (getCollected() == null) {
+	    yield();
+	    return;
+	}
 	if (getHome().getCollectableDifference(CollectableKey.TREE) > 0) {
 	    if (getCollectedPoints() >= MAXIMUM_WEARABLE) {
 		deliverCollected();
@@ -102,6 +106,11 @@ public class Citizen extends MovableObject {
     @Override
     public void repaint() {
 	System.out.println("Repaint for " + getIdPrefix() + " with id " + getId());
+    }
+
+    @Override
+    protected Unit getUnit() {
+	return Unit.CITIZEN;
     }
 
 }
