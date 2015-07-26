@@ -15,6 +15,12 @@ public class Coordinate implements Comparable {
 	this.y = y;
     }
 
+    public Coordinate(int x, int y, int offSetX, int offSetY) {
+	super();
+	this.x = x + offSetX;
+	this.y = y + offSetY;
+    }
+
     public int getX() {
 	return x;
     }
