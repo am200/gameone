@@ -28,6 +28,7 @@ import javafx.stage.Stage;
 public class application extends Application {
 
     private static GameField gameField;
+    private Map<Integer, Map<Integer, String>> fieldMap;
     public static final int GAME_FIELD_WIDTH = 10;
     public static final int GAME_FIELD_HEIGHT = 10;
     public static final int MAXIMUM_STEPS = 1000;
@@ -35,6 +36,13 @@ public class application extends Application {
     public static final int TEMPORARY_COUNTER = 100;
 
     private final static String filePath = "/Users/amohamed/Desktop/output.txt";
+
+    private static boolean gameRunning = true;
+    private static long lastFpsTime = 0L;
+
+    private static long fps = 0L;
+
+    private HomeBase homeBase;
 
     public static DevelopmentState getStartDevelopmentState() {
 	return DevelopmentState.STATE_1;
@@ -52,77 +60,9 @@ public class application extends Application {
 	    gameField = new GameField(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT);
 
 	    stringArray = new String[GAME_FIELD_HEIGHT + 1][GAME_FIELD_WIDTH + 1];
+	    fieldMap = new HashMap<>();
 
-	    Random rand = new Random();
-	    int treeCounter = rand.nextInt((GAME_FIELD_WIDTH * GAME_FIELD_HEIGHT) / 2) + 10;
-
-	    Map<Integer, Map<Integer, String>> fieldMap = new HashMap<>();
-
-	    for (int line = 0; line < GAME_FIELD_HEIGHT; line++) {
-		Map<Integer, String> row = new HashMap<>();
-		for (int x = 0; x < GAME_FIELD_WIDTH; x++) {
-		    row.put(x, " ");
-		}
-		fieldMap.put(line, row);
-	    }
-
-	    System.out.println("################## Start the game #################");
-	    System.out.println("####################################################");
-	    Map<Coordinate, Tree> treeCoorinates = new TreeMap<>();
-	    for (int i = 0; i < treeCounter; i++) {
-
-		int randX = rand.nextInt(GAME_FIELD_WIDTH - 1);
-		int randY = rand.nextInt(GAME_FIELD_HEIGHT - 1);
-		boolean emptyField = false;
-		int tempCounter = 0;
-		Coordinate actualCenter = new Coordinate(randX, randY);
-		while (!emptyField) {
-		    if (gameField.getObjectByCooridante(actualCenter) != null) {
-			randX = rand.nextInt(GAME_FIELD_WIDTH - 1);
-			randY = rand.nextInt(GAME_FIELD_HEIGHT - 1);
-			actualCenter = new Coordinate(randX, randY);
-		    } else {
-			emptyField = true;
-			break;
-		    }
-		    if (tempCounter >= TEMPORARY_COUNTER) {
-			break;
-		    }
-		}
-
-		Coordinate treeCoordinate = new Coordinate(randX, randY);
-		Tree tree = new Tree(treeCoordinate, 1, 1);
-
-		treeCoorinates.put(treeCoordinate, tree);
-		gameField.addObject(tree);
-		fieldMap.get(randY).put(randX, "*");
-		addToGrid(treeCoordinate, "*");
-	    }
-
-	    int treeCounting = 1;
-	    for (Coordinate coord : treeCoorinates.keySet()) {
-		System.out.println("Add Tree nr " + treeCounting + " at X: " + coord.getX() + ", Y: " + coord.getY());
-		treeCounting++;
-	    }
-
-	    int randX = rand.nextInt(GAME_FIELD_WIDTH - 1);
-	    int randY = rand.nextInt(GAME_FIELD_HEIGHT - 1);
-	    boolean emptyField = false;
-	    int tempCounter = 0;
-	    Coordinate actualCenter = new Coordinate(randX, randY);
-	    while (!emptyField) {
-		if (gameField.getObjectByCooridante(actualCenter) != null) {
-		    randX = rand.nextInt(GAME_FIELD_WIDTH - 1);
-		    randY = rand.nextInt(GAME_FIELD_HEIGHT - 1);
-		    actualCenter = new Coordinate(randX, randY);
-		} else {
-		    emptyField = true;
-		    break;
-		}
-		if (tempCounter >= 100) {
-		    break;
-		}
-	    }
+	    initTrees();
 
 	    System.out.println("####################################################");
 
@@ -130,64 +70,97 @@ public class application extends Application {
 
 	    System.out.println("Add Team " + team);
 
-	    HomeBase homeBase = new HomeBase(actualCenter, team, ProductionMode.AUTO);
+	    Coordinate actualCenter = findEmptyCoordinate();
+
+	    homeBase = new HomeBase(actualCenter, team, ProductionMode.AUTO);
 	    fieldMap.get(actualCenter.getY()).put(actualCenter.getX(), "B");
 	    addToGrid(actualCenter, "B");
-	    Coordinate startPoint = new Coordinate(actualCenter.getX() + 1, actualCenter.getY());
-	    Coordinate startPoint2 = new Coordinate(actualCenter.getX(), actualCenter.getY() + 1);
 
-	    Citizen cit = new Citizen(homeBase, startPoint);
-	    cit.setCollect(CollectableKey.TREE);
+	    Coordinate startPoint = new Coordinate(actualCenter.getX(), actualCenter.getY(), 1, 0);
 
-	    Citizen cit2 = new Citizen(homeBase, startPoint2);
-	    cit2.setCollect(CollectableKey.TREE);
+	    addCitizen(startPoint);
 
-	    System.out.println("Add Citizen at X: " + actualCenter.getX() + ", Y: " + actualCenter.getY() + " with home X: 0, Y: 0");
-	    gameField.addObject(cit);
-	    gameField.addObject(cit2);
-	    fieldMap.get(startPoint.getY()).put(startPoint.getX(), "C");
-	    addToGrid(startPoint, "C");
-	    fieldMap.get(startPoint2.getY()).put(startPoint2.getX(), "C");
-	    addToGrid(startPoint2, "C");
+	    Coordinate startPoint2 = new Coordinate(actualCenter.getX(), actualCenter.getY(), 0, 1);
 
-	    System.out.println("####################### FIELD #######################");
-	    String field = "";
-	    String firstAndLastRow = "--";
-	    for (Entry<Integer, Map<Integer, String>> entry : fieldMap.entrySet()) {
-		field += "|";
-		for (Entry<Integer, String> entry2 : entry.getValue().entrySet()) {
-		    field += entry2.getValue();
-		    if (firstAndLastRow.length() <= entry.getValue().size() + 2) {
-			firstAndLastRow += "-";
-		    }
-		}
-		field += "|\n";
-	    }
+	    addCitizen(startPoint2);
 
-	    printGrid();
-	    System.out.println(firstAndLastRow + "\n" + field + firstAndLastRow);
-	    System.out.println("####################################################");
+	    initGrid();
 
-	    System.out.println("####################################################");
-
-	    int timer = 0;
-
-	    while (true) {
-//		cit.execute();
-//		cit2.execute();
-		homeBase.execute();
-
-		if (timer >= 100) {
-		    homeBase.showCollected();
-		    timer = 0;
-		}
-		timer++;
-	    }
+	    gameLoop();
 
 	} catch (Exception e) {
 	    System.out.println("Damn an error occured");
 	    e.printStackTrace();
 	}
+    }
+
+    public void gameLoop() {
+	long lastLoopTime = System.nanoTime();
+	final int TARGET_FPS = 60;
+	final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
+
+	// keep looping round til the game ends
+	while (gameRunning) {
+	    // work out how long its been since the last update, this
+	    // will be used to calculate how far the entities should
+	    // move this loop
+	    long now = System.nanoTime();
+	    long updateLength = now - lastLoopTime;
+	    lastLoopTime = now;
+	    double delta = updateLength / ((double) OPTIMAL_TIME);
+
+	    // update the frame counter
+	    lastFpsTime += updateLength;
+	    fps++;
+
+	    // update our FPS counter if a second has passed since
+	    // we last recorded
+	    if (lastFpsTime >= 1000000000) {
+		System.out.println("(FPS: " + fps + ")");
+		homeBase.showCollected();
+		lastFpsTime = 0;
+		fps = 0;
+	    }
+
+	    // update the game logic
+	    doGameUpdates(delta);
+
+	    // draw everyting
+	    render();
+
+	    // we want each frame to take 10 milliseconds, to do this
+	    // we've recorded when we started the frame. We add 10 milliseconds
+	    // to this and then factor in the current time to give 
+	    // us our final value to wait for
+	    // remember this is in ms, whereas our lastLoopTime etc. vars are in ns.
+	    try {
+		long timeToSleep = (lastLoopTime - System.nanoTime() + OPTIMAL_TIME) / 1000000;
+		Thread.sleep(timeToSleep < 0 ? 0 : timeToSleep);
+	    } catch (InterruptedException e) {
+
+	    }
+	}
+    }
+
+    private void doGameUpdates(double delta) {
+	homeBase.execute();
+//	for (int i = 0; i < stuff.size(); i++) {
+//	    // all time-related values must be multiplied by delta!
+//	    Stuff s = stuff.get(i);
+//	    s.velocity += Gravity.VELOCITY * delta;
+//	    s.position += s.velocity * delta;
+//
+//	    // stuff that isn't time-related doesn't care about delta...
+//	    if (s.velocity >= 1000) {
+//		s.color = Color.RED;
+//	    } else {
+//		s.color = Color.BLUE;
+//	    }
+//	}
+    }
+
+    private void render() {
+	// render
     }
 
     /**
@@ -203,6 +176,29 @@ public class application extends Application {
 
     private void addToGrid(int y, int x, String value) {
 	stringArray[y][x] = value;
+    }
+
+    private void initGrid() {
+	System.out.println("####################### FIELD #######################");
+	String field = "";
+	String firstAndLastRow = "--";
+	for (Entry<Integer, Map<Integer, String>> entry : fieldMap.entrySet()) {
+	    field += "|";
+	    for (Entry<Integer, String> entry2 : entry.getValue().entrySet()) {
+		field += entry2.getValue();
+		if (firstAndLastRow.length() <= entry.getValue().size() + 2) {
+		    firstAndLastRow += "-";
+		}
+	    }
+	    field += "|\n";
+	}
+
+	printGrid();
+	System.out.println(firstAndLastRow + "\n" + field + firstAndLastRow);
+	System.out.println("####################################################");
+
+	System.out.println("####################################################");
+
     }
 
     public void printGrid() {
@@ -254,6 +250,73 @@ public class application extends Application {
 	    }
 	}
 
+    }
+
+    private void initTrees() {
+	Random rand = new Random();
+	int treeCounter = rand.nextInt((GAME_FIELD_WIDTH * GAME_FIELD_HEIGHT) / 2) + 10;
+
+	for (int line = 0; line < GAME_FIELD_HEIGHT; line++) {
+	    Map<Integer, String> row = new HashMap<>();
+	    for (int x = 0; x < GAME_FIELD_WIDTH; x++) {
+		row.put(x, " ");
+	    }
+	    fieldMap.put(line, row);
+	}
+
+	System.out.println("################## Start the game #################");
+	System.out.println("####################################################");
+	Map<Coordinate, Tree> treeCoorinates = new TreeMap<>();
+	for (int i = 0; i < treeCounter; i++) {
+
+	    Coordinate treeCoordinate = findEmptyCoordinate();
+
+	    Tree tree = new Tree(treeCoordinate, 1, 1);
+
+	    treeCoorinates.put(treeCoordinate, tree);
+	    gameField.addObject(tree);
+	    fieldMap.get(treeCoordinate.getY()).put(treeCoordinate.getX(), "*");
+	    addToGrid(treeCoordinate, "*");
+	}
+
+	int treeCounting = 1;
+	for (Coordinate coord : treeCoorinates.keySet()) {
+	    System.out.println("Add Tree nr " + treeCounting + " at X: " + coord.getX() + ", Y: " + coord.getY());
+	    treeCounting++;
+	}
+    }
+
+    private void addCitizen(Coordinate startPoint) {
+	Citizen cit = new Citizen(homeBase, startPoint);
+	cit.setCollect(CollectableKey.TREE);
+
+	System.out.println("Add Citizen at X: " + startPoint.getX() + ", Y: " + startPoint.getY() + " with home X: 0, Y: 0");
+	gameField.addObject(cit);
+	fieldMap.get(startPoint.getY()).put(startPoint.getX(), "C");
+	addToGrid(startPoint, "C");
+    }
+
+    private Coordinate findEmptyCoordinate() {
+	Random rand = new Random();
+	int randX = rand.nextInt(GAME_FIELD_WIDTH - 1);
+	int randY = rand.nextInt(GAME_FIELD_HEIGHT - 1);
+	boolean emptyField = false;
+	int tempCounter = 0;
+	Coordinate actualCenter = new Coordinate(randX, randY);
+	while (!emptyField) {
+	    if (gameField.getObjectByCooridante(actualCenter) != null) {
+		randX = rand.nextInt(GAME_FIELD_WIDTH - 1);
+		randY = rand.nextInt(GAME_FIELD_HEIGHT - 1);
+		actualCenter = new Coordinate(randX, randY);
+	    } else {
+		emptyField = true;
+		break;
+	    }
+	    if (tempCounter >= 100) {
+		break;
+	    }
+	}
+	return actualCenter;
     }
 
 }
