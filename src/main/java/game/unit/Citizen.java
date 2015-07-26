@@ -1,6 +1,6 @@
 package game.unit;
 
-import game.application;
+import game.GameData;
 import game.collectable.util.CollectableKey;
 import game.collectable.CollectableObject;
 import game.base.Coordinate;
@@ -42,7 +42,7 @@ public class Citizen extends MovableObject {
 
     public HealthObject findNextObject() {
 	HealthObject found;
-	found = (HealthObject) getCoordinateSet().findNextObject(getCenter(), collectable.getKey(), application.getGameField());
+	found = (HealthObject) getCoordinateSet().findNextObject(getCenter(), collectable.getKey(), GameData.getGameField());
 	if (found != null) {
 	    collect(found);
 	}

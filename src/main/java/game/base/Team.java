@@ -1,6 +1,6 @@
 package game.base;
 
-import game.application;
+import game.GameData;
 import game.collectable.CollectableObject;
 import game.collectable.util.CollectableKey;
 import game.util.DevelopmentState;
@@ -31,7 +31,7 @@ public class Team extends AbstractBaseObject {
 	super();
 	collectableMap = new HashMap<>();
 	collectableMap.put(CollectableKey.TREE, new CollectableObject(0, 1000, CollectableKey.TREE));
-	this.actualDevelopmentState = application.getStartDevelopmentState();
+	this.actualDevelopmentState = GameData.getStartDevelopmentState();
     }
 
     public Team(String id, String name, String color, String image) {

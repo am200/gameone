@@ -2,7 +2,7 @@ package game.base;
 
 import game.coordinateSet.AbstractCoordinateSet;
 import game.building.HomeBase;
-import game.application;
+import game.GameData;
 import game.unit.Unit;
 import java.util.Random;
 import javafx.util.Pair;
@@ -39,7 +39,7 @@ public abstract class MovableObject extends TeamObject implements Runnable {
 
     public void moveTo(Coordinate movingTo) {
 
-	Pair<Integer, Integer> borders = application.getGameField().getBorders();
+	Pair<Integer, Integer> borders = GameData.getGameField().getBorders();
 	if (movingTo.getX() <= borders.getKey() && movingTo.getX() >= 0 && movingTo.getY() <= borders.getValue() && movingTo.getY() >= 0) {
 	    setCenter(movingTo);
 	    updateCoordinateSet();
@@ -88,7 +88,7 @@ public abstract class MovableObject extends TeamObject implements Runnable {
 	int newX = getCenter().getX();
 	int newY = getCenter().getY();
 
-	Pair<Integer, Integer> borders = application.getGameField().getBorders();
+	Pair<Integer, Integer> borders = GameData.getGameField().getBorders();
 
 	int temp = new Random().nextInt(15) % 8;
 

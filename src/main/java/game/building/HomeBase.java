@@ -1,6 +1,6 @@
 package game.building;
 
-import game.application;
+import game.GameData;
 import game.base.Coordinate;
 import game.base.Team;
 import game.collectable.CollectableObject;
@@ -62,7 +62,7 @@ public class HomeBase extends Building {
 	boolean result = false;
 
 	for (CollectableObject collect : getTeam().getCollectableMap().values()) {
-	    if (collect.getPointDifference() > 0 && application.getGameField().getObjectCountByType(collect.getKey().name()) > 0) {
+	    if (collect.getPointDifference() > 0 && GameData.getGameField().getObjectCountByType(collect.getKey().name()) > 0) {
 		result = true;
 	    }
 	}

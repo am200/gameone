@@ -18,14 +18,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
-import javafx.application.Application;
-import javafx.stage.Stage;
 
 /**
  *
  * @author amohamed
  */
-public class application extends Application {
+public class GameData implements Runnable{
+//    /**
+//     * static logger-object
+//     */
+////    private static final Logger LOGGER = Logger.getLogger(application.class);
 
     private static GameField gameField;
     private Map<Integer, Map<Integer, String>> fieldMap;
@@ -54,8 +56,7 @@ public class application extends Application {
 	return gameField;
     }
 
-    @Override
-    public void start(Stage primaryStage) {
+    public void init() {
 	try {
 	    gameField = new GameField(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT);
 
@@ -85,16 +86,13 @@ public class application extends Application {
 	    addCitizen(startPoint2);
 
 	    initGrid();
-
-	    gameLoop();
-
 	} catch (Exception e) {
 	    System.out.println("Damn an error occured");
 	    e.printStackTrace();
 	}
     }
 
-    public void gameLoop() {
+    public void startGame() {
 	long lastLoopTime = System.nanoTime();
 	final int TARGET_FPS = 60;
 	final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
@@ -161,13 +159,6 @@ public class application extends Application {
 
     private void render() {
 	// render
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-	launch(args);
     }
 
     private void addToGrid(Coordinate coord, String value) {
@@ -317,6 +308,11 @@ public class application extends Application {
 	    }
 	}
 	return actualCenter;
+    }
+
+    @Override
+    public void run() {
+	startGame();
     }
 
 }

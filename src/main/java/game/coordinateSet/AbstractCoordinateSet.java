@@ -1,6 +1,6 @@
 package game.coordinateSet;
 
-import game.application;
+import game.GameData;
 import game.base.Coordinate;
 import game.terrain.GameField;
 import game.base.PositionObject;
@@ -28,7 +28,7 @@ public abstract class AbstractCoordinateSet {
 
     private void setCoordinateSet() {
 
-	Pair<Integer, Integer> borders = application.getGameField().getBorders();
+	Pair<Integer, Integer> borders = GameData.getGameField().getBorders();
 	for (RangeSet range : defineCoordinateRange()) {
 	    Coordinate coord = calcNewPosition(range.getX(), range.getY());
 	    if (coord.getX() <= borders.getKey() && coord.getX() >= 0 && coord.getY() <= borders.getValue() && coord.getY() >= 0) {
