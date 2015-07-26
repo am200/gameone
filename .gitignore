@@ -6,3 +6,6 @@ build/*
 .project
 bin/
 build.fxbuild
+/target
+/target/
+/target/*
