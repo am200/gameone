@@ -62,7 +62,7 @@ public class HomeBase extends Building {
 	boolean result = false;
 
 	for (CollectableObject collect : getTeam().getCollectableMap().values()) {
-	    if (collect.getPointDifference() > 0 && application.getGameField().getObjectCountByType(CollectableKey.TREE.name()) > 0) {
+	    if (collect.getPointDifference() > 0 && application.getGameField().getObjectCountByType(collect.getKey().name()) > 0) {
 		result = true;
 	    }
 	}

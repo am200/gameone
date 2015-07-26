@@ -143,7 +143,7 @@ public abstract class Building extends HealthObject {
 	    System.out.println("There are " + entry.getValue().size() + " " + entry.getKey() + "(s)");
 	}
 
-	execute();
+//	execute();
 	System.out.println("####################################################");
     }
 
@@ -153,9 +153,13 @@ public abstract class Building extends HealthObject {
 
     public void execute() {
 	if (checkForExecute()) {
-	    for (List<MovableObject> movableSet : belongingUnits.values()) {
-		for (MovableObject movable : movableSet) {
-		    movable.execute();
+	    for (Entry<Unit, List<MovableObject>> entry : belongingUnits.entrySet()) {
+		if (entry != null && entry.getValue() != null && !entry.getValue().isEmpty()) {
+		    List<MovableObject> list = new ArrayList<>();
+		    list.addAll(entry.getValue());
+		    for (MovableObject movable : list) {
+			movable.execute();
+		    }
 		}
 	    }
 	}
